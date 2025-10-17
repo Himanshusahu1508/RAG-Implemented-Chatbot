@@ -2,6 +2,7 @@ import streamlit as st
 import faiss, pickle, numpy as np
 from sentence_transformers import SentenceTransformer
 import google.generativeai as genai
+import re
 
 
 index = faiss.read_index("faiss_index.bin")
