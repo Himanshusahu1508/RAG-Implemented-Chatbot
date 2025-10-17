@@ -20,9 +20,12 @@ def retrieve_context(query, top_k=3):
     retrieved_docs = [texts[i] for i in indices[0]]
     return "\n".join(retrieved_docs)
 
-
 def generate_response(query):
     context = retrieve_context(query)
+    context = re.sub(r'[^\x00-\x7F]+',' ', context)
+    context = re.sub(r'\s+', ' ', context).strip()
+    context = context[:3500]  # avoid Gemini token overflow
+
     prompt = f"""
     You are a customer support assistant.
     Use the following RCA context to explain the user's issue briefly and professionally.
@@ -32,8 +35,14 @@ def generate_response(query):
 
     Question: {query}
     """
-    response = model.generate_content(prompt)
-    return response.text if response and response.text else "No response generated."
+
+    try:
+        model = genai.GenerativeModel("models/gemini-2.5-pro")
+        response = model.generate_content(prompt)
+        return response.text if response and response.text else "No response generated."
+    except Exception as e:
+        return f"Gemini API Error: {str(e)}"
+
 
 
 st.title("Customer Support RCA Assistant")
