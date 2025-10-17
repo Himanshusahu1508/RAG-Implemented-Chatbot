@@ -4,6 +4,11 @@ from sentence_transformers import SentenceTransformer
 import google.generativeai as genai
 import re
 
+#Adding memory seeing the app performance for 3 turns
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+
 
 index = faiss.read_index("faiss_index.bin")
 with open("texts.pkl", "rb") as f:
@@ -22,36 +27,69 @@ def retrieve_context(query, top_k=3):
     return "\n".join(retrieved_docs)
 
 def generate_response(query):
+    # Step 1️: Retrieve RCA context
     context = retrieve_context(query)
     context = re.sub(r'[^\x00-\x7F]+',' ', context)
     context = re.sub(r'\s+', ' ', context).strip()
-    context = context[:3500]  # avoid Gemini token overflow
+    context = context[:3500]  # avoid token overflow
 
+    # Step 2️: Add short memory (last 3 turns)
+    conversation_history = "\n".join([
+        f"User: {m['user']}\nAssistant: {m['bot']}"
+        for m in st.session_state.history[-3:]
+    ])
+
+    # Step 3️: Build final prompt
     prompt = f"""
-    You are a customer support assistant.
-    Use the following RCA context to explain the user's issue briefly and professionally.
+    You are a customer support RCA assistant.
+    You explain customer complaint trends clearly and concisely.
 
-    RCA context:
+    Conversation so far:
+    {conversation_history}
+
+    RCA Context:
     {context}
 
-    Question: {query}
+    Current Question: {query}
+
+    Keep the tone analytical and professional.
     """
 
+    # Generate response from Gemini
     try:
         model = genai.GenerativeModel("models/gemini-2.5-pro")
         response = model.generate_content(prompt)
-        return response.text if response and response.text else "No response generated."
+        answer = response.text.strip() if response and response.text else "No response generated."
     except Exception as e:
-        return f"Gemini API Error: {str(e)}"
+        answer = f"Gemini API Error: {str(e)}"
+
+    #Save this exchange in memory
+    st.session_state.history.append({"user": query, "bot": answer})
+
+    return answer
+
 
 
 
 st.title("Customer Support RCA Assistant")
 st.write("Ask about delivery delays, refunds, app issues, or support trends.")
 
-query = st.text_input("Enter your question:")
-if st.button("Get Response"):
-    with st.spinner("Analyzing complaints..."):
-        answer = generate_response(query)
-    st.subheader("Response:")
-    st.write(answer)
+st.markdown("Ask about delivery delays, refunds, or app crashes. The bot remembers your last 3 questions!")
+
+# Previous conversation
+for message in st.session_state.history:
+    with st.chat_message("user"):
+        st.write(message["user"])
+    with st.chat_message("assistant"):
+        st.write(message["bot"])
+
+# Chat input box
+user_query = st.chat_input("Ask your question about complaints...")
+if user_query:
+    with st.chat_message("user"):
+        st.write(user_query)
+    with st.spinner("Analyzing RCA context..."):
+        response = generate_response(user_query)
+    with st.chat_message("assistant"):
+        st.write(response)
+
