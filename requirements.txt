@@ -4,3 +4,5 @@ faiss-cpu==1.8.0
 google-generativeai==0.8.0
 numpy==1.26.4
 pandas==2.2.2
+huggingface-hub==0.19.4  
+torch==2.2.2
