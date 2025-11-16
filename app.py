@@ -72,7 +72,6 @@ def generate_response(query):
 
 
 st.title("Customer Support RCA Assistant")
-st.write("Ask about delivery delays, refunds, app issues, or support trends.")
 
 st.markdown("Ask about delivery delays, refunds, or app crashes. The bot remembers your last 3 questions!")
 
