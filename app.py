@@ -16,7 +16,7 @@ with open("texts.pkl", "rb") as f:
 embedder = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')
 
 
-genai.configure(api_key="AIzaSyDx0CbhRG_cuKyU7_rzejfLmaG-C2ZQr8s")
+genai.configure(api_key="AIzaSyDi164J3DwvtxKA1UXAjVQU-QuAxa7nCgU")
 model = genai.GenerativeModel("models/gemini-2.5-pro")
 
 
