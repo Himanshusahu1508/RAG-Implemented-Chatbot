@@ -58,7 +58,7 @@ def generate_response(query):
 
     # Generate response from Gemini
     try:
-        model = genai.GenerativeModel("models/gemini-2.5-pro")
+        model = genai.GenerativeModel("models/gemini-1.5-flash")
         response = model.generate_content(prompt)
         answer = response.text.strip() if response and response.text else "No response generated."
     except Exception as e:
