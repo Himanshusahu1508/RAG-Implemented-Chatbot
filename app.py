@@ -17,7 +17,8 @@ embedder = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')
 
 
 genai.configure(api_key="AIzaSyDi164J3DwvtxKA1UXAjVQU-QuAxa7nCgU")
-model = genai.GenerativeModel("models/gemini-2.5-pro")
+model = genai.GenerativeModel("models/gemini-1.5-flash")
+
 
 
 def retrieve_context(query, top_k=3):
