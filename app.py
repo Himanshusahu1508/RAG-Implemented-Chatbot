@@ -17,7 +17,7 @@ embedder = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')
 
 
 genai.configure(api_key="AIzaSyDi164J3DwvtxKA1UXAjVQU-QuAxa7nCgU")
-model = genai.GenerativeModel("models/gemini-pro-latest")
+model = genai.GenerativeModel("models/gemini-2.5-flash-lite")
 
 
 
@@ -58,7 +58,7 @@ def generate_response(query):
 
     # Generate response from Gemini
     try:
-        model = genai.GenerativeModel("models/gemini-pro-latest")
+        model = genai.GenerativeModel("models/gemini-2.5-flash-lite")
         response = model.generate_content(prompt)
         answer = response.text.strip() if response and response.text else "No response generated."
     except Exception as e:
